@@ -19,9 +19,4 @@ public class CandidateController {
     public String check(){
         return "Working fine";
     }
-
-//    @GetMapping("see-votes/{email}")
-//    public ResponseEntity<?> seeVotes(@PathVariable String email){
-//        return candidateService.seeVotes(email);
-//    }
 }
