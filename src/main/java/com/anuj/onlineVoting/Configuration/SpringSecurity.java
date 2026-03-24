@@ -33,17 +33,14 @@ public class SpringSecurity {
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers("/public/**").permitAll()
                         .requestMatchers( "/user/**").hasRole("User")
+                        .requestMatchers("/candidate/**").hasRole("Candidate")
+                        .requestMatchers("/voter").hasRole("Voter")
                         .anyRequest().permitAll())
                 .authenticationProvider(authenticationProvider())
                 .httpBasic(Customizer.withDefaults())
 //                .addFilterBefore(jwtFilter, UsernamePasswordAuthenticationFilter.class)
                 .build();
     }
-
-//    @Autowired
-//    public void configureGlobal(AuthenticationManagerBuilder auth) throws Exception {
-//        auth.userDetailsService(userDetailsImpl).passwordEncoder(passwordEncoder());
-//    }
 
 
     @Bean

@@ -33,11 +33,6 @@ public class PublicController {
         return publicService.saveUser(user);
     }
 
-    @PostMapping("pass/{email}")
-    public boolean encryptPassword(@PathVariable String email){
-        return userService.EncryptPassword(email);
-    }
-
     @PostMapping("application/candidate/{id}")
     public ResponseEntity<?> candidateApplication(@RequestBody Applicant application, @PathVariable String id){
         return applicantService.submitCandidatureApplication(application,id);

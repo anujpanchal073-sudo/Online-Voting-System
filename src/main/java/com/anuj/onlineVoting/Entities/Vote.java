@@ -7,5 +7,6 @@ import java.util.Map;
 
 public class Vote {
 
+    //Map<post, idOfCandidate>
     private Map<String, ObjectId> vote = new HashMap<>();
 }

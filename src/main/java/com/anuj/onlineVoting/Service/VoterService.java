@@ -30,13 +30,14 @@ public class VoterService {
         }
     }
 
-//    public boolean castVote(Vote vote){
-//        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-//        String email = authentication.getName();
-//        Voter voter = voterRepo.findByemail(email);
-//        if(!voter.getHas_voted()){
-//        }
-//        return false;
-//    }
+    public ResponseEntity<?> castVote(Vote vote){
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        String email = authentication.getName();
+        Voter voter = voterRepo.findByemail(email);
+        if(voter != null){
+
+        }
+        return ResponseEntity.ok("ok");
+    }
 
 }

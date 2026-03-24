@@ -57,19 +57,6 @@ public class UserService {
         return userRepo.findByemail(email);
     }
 
-    public boolean EncryptPassword(String email){
-        try{
-            User userFromDb = userRepo.findByemail(email);
-            userFromDb.setPassword(encoder.encode(userFromDb.getName()));
-            userRepo.save(userFromDb);
-            return true;
-        } catch (Exception e) {
-            System.out.println(e);
-            return false;
-        }
-
-    }
-
     //TO HOST A NEW POLL
     public ObjectId hostPoll(Poll poll){
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();

@@ -34,23 +34,4 @@ public class CandidateService {
         }
     }
 
-//    public ResponseEntity<?> seeVotes(String email){
-//        Candidate candidate = candidateRepo.findByemail(email);
-//        if(candidate != null){
-//            ObjectId pollId = candidate.getAppliedPollId();
-//            Poll poll = pollRepo.findByid(pollId);
-//            LocalDateTime presentTime = LocalDateTime.now();
-//            if(presentTime.isBefore(poll.getStartDateTime())){
-//                return ResponseEntity.ok("Polls not started yet.");
-//            }
-//            else if (!presentTime.isBefore(poll.getStartDateTime())&& !presentTime.isAfter(poll.getEndDateTime())){
-//                return ResponseEntity.ok("Polls are ongoing. Wait for the polls to end.");
-//            }
-//
-//            return ResponseEntity.ok(candidate);
-//        }
-//        else{
-//            return ResponseEntity.ok("No such candidate found");
-//        }
-//    }
 }
