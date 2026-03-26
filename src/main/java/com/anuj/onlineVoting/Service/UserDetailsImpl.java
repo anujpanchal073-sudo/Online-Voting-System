@@ -35,7 +35,6 @@ public class UserDetailsImpl implements UserDetailsService {
                         .roles(user.getRoles().toArray(new String[0]))
                         .password(user.getPassword())
                         .build();
-                System.out.println("user built");
                 return userDetails;
             } catch (Exception e) {
                 System.out.println(e);

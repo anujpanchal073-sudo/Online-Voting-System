@@ -1,5 +1,6 @@
 package com.anuj.onlineVoting.Configuration;
 
+import com.anuj.onlineVoting.Filter.JwtFilter;
 import com.anuj.onlineVoting.Service.UserDetailsImpl;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
@@ -16,6 +17,7 @@ import org.springframework.security.config.annotation.web.configurers.AbstractHt
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 //import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
 @Configuration
@@ -25,9 +27,11 @@ public class SpringSecurity {
     @Autowired
     private UserDetailsImpl userDetailsImpl;
 
+    @Autowired
+    JwtFilter jwtFilter;
+
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
-        System.out.println(1);
         return http
                 .csrf(AbstractHttpConfigurer::disable)
                 .authorizeHttpRequests(auth -> auth
@@ -37,8 +41,8 @@ public class SpringSecurity {
                         .requestMatchers("/voter").hasRole("Voter")
                         .anyRequest().permitAll())
                 .authenticationProvider(authenticationProvider())
-                .httpBasic(Customizer.withDefaults())
-//                .addFilterBefore(jwtFilter, UsernamePasswordAuthenticationFilter.class)
+//                .httpBasic(Customizer.withDefaults())
+                .addFilterBefore(jwtFilter, UsernamePasswordAuthenticationFilter.class)
                 .build();
     }
 
