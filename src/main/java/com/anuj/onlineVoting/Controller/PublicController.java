@@ -25,15 +25,6 @@ public class PublicController {
     @Autowired
     ApplicantService applicantService;
 
-    @Autowired
-    AuthenticationManager authenticationManager;
-
-    @Autowired
-    UserDetailsImpl userDetailsImpl;
-
-    @Autowired
-    JwtUtil jwtUtil;
-
     @GetMapping("/check")
     public String check(){
         return "Working Perfectly";
@@ -56,14 +47,7 @@ public class PublicController {
 
     @PostMapping("login")
     public String login(@RequestBody User user){
-        try{
-            authenticationManager.authenticate(new
-                    UsernamePasswordAuthenticationToken(user.getEmail(), user.getPassword()));
-            UserDetails userDetails = userDetailsImpl.loadUserByUsername(user.getEmail());
-            return jwtUtil.generateToken(userDetails.getUsername());
-        } catch (Exception e) {
-            return "No such user found";
-        }
+        return publicService.login(user);
     }
 
 }

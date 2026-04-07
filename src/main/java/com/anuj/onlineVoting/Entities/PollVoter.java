@@ -5,10 +5,8 @@ import org.bson.types.ObjectId;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.time.LocalDateTime;
+import java.util.*;
 
 @Data
 @Document(collection = "PollVoters")
@@ -27,6 +25,10 @@ public class PollVoter {
     private List<String> posts = new ArrayList<>();
 
     //Map<name of posts, true or false that a voter has casted vote for the corresponding post
-    private Map<String, Boolean> has_voted = new HashMap<>();
+    private Map<String,Boolean> has_voted = new HashMap<>();
+
+    private Boolean ballotGenerated = false;
+
+    private Date ballotExpirationTime = null;
 
 }

@@ -181,7 +181,7 @@ public class UserService {
         applicantRepo.deleteById(obIdOfApplicant);
         Voter voter = voterRepo.findByemail(applicant.getEmail());
         if(voter != null){
-            PollVoter pollVoter = criteriaRepo.findPollVoterByEmailAndPollId(applicant.getAppliedPollId(),voter.getId());
+            PollVoter pollVoter = criteriaRepo.findPollVoterByVoterIdAndPollId(applicant.getAppliedPollId(),voter.getId());
             if(pollVoter != null){
                 pollVoter.getPosts().add(applicant.getPost_applied_for());
                 pollVoter.getHas_voted().put(applicant.getPost_applied_for(), false);

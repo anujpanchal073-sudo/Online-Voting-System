@@ -38,9 +38,9 @@ public class SpringSecurity {
                         .requestMatchers("/public/**").permitAll()
                         .requestMatchers( "/user/**").hasRole("User")
                         .requestMatchers("/candidate/**").hasRole("Candidate")
-                        .requestMatchers("/voter").hasRole("Voter")
+                        .requestMatchers("/voter/**").hasRole("Voter")
                         .anyRequest().permitAll())
-                .authenticationProvider(authenticationProvider())
+//                .authenticationProvider(authenticationProvider())
 //                .httpBasic(Customizer.withDefaults())
                 .addFilterBefore(jwtFilter, UsernamePasswordAuthenticationFilter.class)
                 .build();
