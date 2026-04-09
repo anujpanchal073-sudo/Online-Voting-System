@@ -2,6 +2,7 @@ package com.anuj.onlineVoting.Controller;
 
 import com.anuj.onlineVoting.Entities.Applicant;
 import com.anuj.onlineVoting.Entities.Poll;
+import com.anuj.onlineVoting.Entities.Result;
 import com.anuj.onlineVoting.Entities.User;
 import com.anuj.onlineVoting.Service.UserService;
 import org.bson.types.ObjectId;
@@ -10,6 +11,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Objects;
 
 @RestController
 @RequestMapping("user")
@@ -56,6 +58,12 @@ public class UserController {
     @PostMapping("accept-voter/{id}")
     public ResponseEntity<?> acceptVoterApplication(@PathVariable String id){
         return userService.acceptVoterApplication(id);
+    }
+
+    @GetMapping("compute-result/{pollId}")
+    public ResponseEntity<?> computeResult(@PathVariable String pollId){
+        return ResponseEntity
+                .ok(Objects.requireNonNullElse(userService.computeResult(pollId), "No such poll found or Polling has not ended yet"));
     }
 
 }

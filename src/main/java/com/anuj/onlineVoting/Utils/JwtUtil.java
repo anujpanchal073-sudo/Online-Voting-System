@@ -18,12 +18,13 @@ public class JwtUtil {
         return Keys.hmacShaKeyFor(SECRET.getBytes());
     }
 
-    public String generateToken(String username){
+    public String generateToken(String username, String role){
         Map<String, Object> claims = new HashMap<>();
-        return createToken(claims, username);
+        claims.put("role", role);
+        return createToken(claims, username, role);
     }
 
-    public String createToken(Map<String, Object> claims, String username){
+    public String createToken(Map<String, Object> claims, String username, String role){
         return Jwts.builder()
                 .setClaims(claims)
                 .setSubject(username)

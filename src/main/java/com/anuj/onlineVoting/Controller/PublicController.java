@@ -1,17 +1,14 @@
 package com.anuj.onlineVoting.Controller;
 
 import com.anuj.onlineVoting.Entities.Applicant;
+import com.anuj.onlineVoting.Entities.Candidate;
 import com.anuj.onlineVoting.Entities.User;
+import com.anuj.onlineVoting.Entities.Voter;
 import com.anuj.onlineVoting.Service.ApplicantService;
 import com.anuj.onlineVoting.Service.PublicService;
-import com.anuj.onlineVoting.Service.UserDetailsImpl;
-import com.anuj.onlineVoting.Utils.JwtUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.authentication.AuthenticationManager;
-import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
-import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.*;
 
 @Slf4j
@@ -45,9 +42,19 @@ public class PublicController {
         return applicantService.submitVoterApplication(application,id);
     }
 
-    @PostMapping("login")
+    @PostMapping("login/user")
     public String login(@RequestBody User user){
-        return publicService.login(user);
+        return publicService.loginUser(user);
+    }
+
+    @PostMapping("login/candidate")
+    public String login(@RequestBody Candidate candidate){
+        return publicService.loginCandidate(candidate);
+    }
+
+    @PostMapping("login/voter")
+    public String login(@RequestBody Voter voter){
+        return publicService.loginVoter(voter);
     }
 
 }

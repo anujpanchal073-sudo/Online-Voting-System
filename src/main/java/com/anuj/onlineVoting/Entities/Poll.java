@@ -38,4 +38,7 @@ public class Poll {
     private List<ObjectId> applicantsOfCandidature = new ArrayList<>();
 
     private List<ObjectId> applicantsOfVoter = new ArrayList<>();
+
+    private Boolean resultAnnounced = false;
+
 }

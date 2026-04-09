@@ -49,7 +49,7 @@ public class VoterService {
         String username = authentication.getName();
         ObjectId obPollId = new ObjectId(pollId);
         Voter voter = voterRepo.findByemail(username);
-        Poll poll = pollService.findPoll(obPollId);
+        Poll poll = pollService.findPoll(pollId);
         if(voter.getAppliedPollId().contains(obPollId)){
             if(poll.getStartDateTime().isAfter(LocalDateTime.now())){
                 return ResponseEntity.ok("Polling is not started yet.");
@@ -104,7 +104,9 @@ public class VoterService {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         String email = authentication.getName();
         Voter voter = voterRepo.findByemail(email);
-        return ResponseEntity.ok(pollCandidateService.castVote(pollId, voter.getId(), vote.getVotes()));
+        PollVoter pollVoter =  (PollVoter) pollCandidateService.castVote(pollId, voter.getId(), vote.getVotes()).getBody();
+        pollVoterService.save(pollVoter);
+        return ResponseEntity.ok(true);
     }
 
 }

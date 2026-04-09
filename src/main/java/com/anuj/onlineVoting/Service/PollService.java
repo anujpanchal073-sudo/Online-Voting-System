@@ -12,6 +12,14 @@ public class PollService {
     @Autowired
     PollRepository pollRepo;
 
+    public Poll findPoll(String pollId){
+        return pollRepo.findByid(new ObjectId(pollId));
+    }
+
+    public Poll savePoll(Poll poll){
+        return pollRepo.save(poll);
+    }
+
     public Poll findPoll(ObjectId pollId){
         return pollRepo.findByid(pollId);
     }

@@ -36,19 +36,13 @@ public class CriteriaRepository {
 
     public ResponseEntity<?> addVote(ObjectId pollId, ObjectId voterId, Map<String, ObjectId> votes){
 
+        PollVoter pollVoter = findPollVoterByVoterIdAndPollId(pollId, voterId);
+
         for(Map.Entry<String, ObjectId> entry: votes.entrySet()){
             String post = entry.getKey();
             ObjectId candidateId = entry.getValue();
 
-            mongoTemplate.updateFirst(
-                    Query.query(Criteria
-                            .where("pollId")
-                            .is(pollId)
-                            .and("voterId")
-                            .is(voterId)),
-                    new Update().set("has_voted." + post, true),
-                    PollVoter.class
-            );
+            pollVoter.getHas_voted().put(post, true);
 
             mongoTemplate.updateFirst(
                     Query.query(Criteria
@@ -61,7 +55,12 @@ public class CriteriaRepository {
             );
 
         }
-        return ResponseEntity.ok(true);
+        return ResponseEntity.ok(pollVoter);
     }
 
+    public List<PollCandidate> getPollCandidatesForResult(ObjectId pollId){
+        Query query = new Query();
+        query.addCriteria(Criteria.where("pollId").is(pollId));
+        return mongoTemplate.find(query, PollCandidate.class);
+    }
 }

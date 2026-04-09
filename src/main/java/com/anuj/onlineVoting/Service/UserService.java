@@ -11,10 +11,8 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Map;
+import java.time.LocalDateTime;
+import java.util.*;
 
 @Service
 public class UserService {
@@ -23,7 +21,7 @@ public class UserService {
     UserRepository userRepo;
 
     @Autowired
-    PollRepository pollRepo;
+    PollService pollService;
 
     @Autowired
     ApplicantRepository applicantRepo;
@@ -41,13 +39,16 @@ public class UserService {
     VoterService voterService;
 
     @Autowired
-    PollCandidateRepository pollCandidateRepo;
+    PollCandidateService pollCandidateService;
 
     @Autowired
     CriteriaRepository criteriaRepo;
 
     @Autowired
     PollVoterRepository pollVoterRepo;
+
+    @Autowired
+    ResultService resultService;
 
     private static final PasswordEncoder encoder = new BCryptPasswordEncoder();
 
@@ -62,7 +63,7 @@ public class UserService {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         String email = authentication.getName();
         User user = userRepo.findByemail(email);
-        Poll hostedPoll = pollRepo.save(poll);
+        Poll hostedPoll = pollService.savePoll(poll);
         user.getElections().add(hostedPoll.getId());
         userRepo.save(user);
         return hostedPoll.getId();
@@ -70,9 +71,8 @@ public class UserService {
 
     //TO VIEW CANDIDATURE APPLICATIONS
     public List<Applicant> viewCandidatureApplications(String id){
-        ObjectId objectId = new ObjectId(id);
         List<Applicant> applicants = new ArrayList<>();
-        for(ObjectId o: pollRepo.findByid(objectId).getApplicantsOfCandidature()){
+        for(ObjectId o: pollService.findPoll(id).getApplicantsOfCandidature()){
             applicants.add(applicantRepo.findByid(o));
         }
         return applicants;
@@ -80,9 +80,8 @@ public class UserService {
 
     //TO VIEW VOTER APPLICATIONS
     public List<Applicant> viewVoterApplications(String id){
-        ObjectId objectId = new ObjectId(id);
         List<Applicant> applicants = new ArrayList<>();
-        for(ObjectId o: pollRepo.findByid(objectId).getApplicantsOfVoter()){
+        for(ObjectId o: pollService.findPoll(id).getApplicantsOfVoter()){
             applicants.add(applicantRepo.findByid(o));
         }
         return applicants;
@@ -93,9 +92,9 @@ public class UserService {
         try{
             ObjectId obIdOfApplicant = new ObjectId(idOfApplicant);
             Applicant applicant = applicantRepo.findByid(obIdOfApplicant);
-            Poll poll = pollRepo.findByid(applicant.getAppliedPollId());
+            Poll poll = pollService.findPoll(applicant.getAppliedPollId().toHexString());
             poll.getApplicantsOfCandidature().remove(obIdOfApplicant);
-            pollRepo.save(poll);
+            pollService.savePoll(poll);
             applicantRepo.deleteById(obIdOfApplicant);
             return true;
         } catch (Exception e) {
@@ -109,9 +108,9 @@ public class UserService {
         try{
             ObjectId obIdOfApplicant = new ObjectId(idOfApplicant);
             Applicant applicant = applicantRepo.findByid(obIdOfApplicant);
-            Poll poll = pollRepo.findByid(applicant.getAppliedPollId());
+            Poll poll = pollService.findPoll(applicant.getAppliedPollId().toHexString());
             poll.getApplicantsOfVoter().remove(obIdOfApplicant);
-            pollRepo.save(poll);
+            pollService.savePoll(poll);
             applicantRepo.deleteById(obIdOfApplicant);
             return true;
         } catch (Exception e) {
@@ -126,7 +125,7 @@ public class UserService {
         ObjectId obIdOfApplicant = new ObjectId(idOfApplicant);
         Applicant applicant = applicantRepo.findByid(obIdOfApplicant);
         Candidate candidate = candidateRepo.findByemail(applicant.getEmail());
-        Poll poll = pollRepo.findByid(applicant.getAppliedPollId());
+        Poll poll = pollService.findPoll(applicant.getAppliedPollId().toHexString());
         if(candidate != null){
             PollCandidate pollCandidate = criteriaRepo.findPollCandidateByEmailAndPollId(applicant.getAppliedPollId(),candidate.getId());
             if(pollCandidate != null){
@@ -139,7 +138,7 @@ public class UserService {
                 pollCandidate1.setPost(applicant.getPost_applied_for());
                 pollCandidate1.setTitle_of_pole(poll.getTitle());
                 pollCandidate1.setVotes(0);
-                pollCandidateRepo.save(pollCandidate1);
+                pollCandidateService.save(pollCandidate1);
                 candidate.getAppliedPollId().add(applicant.getAppliedPollId());
                 candidateRepo.save(candidate);
             }
@@ -152,7 +151,7 @@ public class UserService {
             pollCandidate.setPollId(poll.getId());
             pollCandidate.setPost(applicant.getPost_applied_for());
             pollCandidate.setVotes(0);
-            pollCandidateRepo.save(pollCandidate);
+            pollCandidateService.save(pollCandidate);
         }
         applicantRepo.deleteById(obIdOfApplicant);
         poll.getApplicantsOfCandidature().remove(obIdOfApplicant);
@@ -161,11 +160,11 @@ public class UserService {
         String post = applicant.getPost_applied_for();
         if(mp.containsKey(post)){
             mp.get(post).add(obIdOfApplicant);
-            return ResponseEntity.ok(pollRepo.save(poll));
+            return ResponseEntity.ok(pollService.savePoll(poll));
         }
         else{
             mp.put(post, new ArrayList<>(Arrays.asList(obIdOfApplicant)));
-            return ResponseEntity.ok(pollRepo.save(poll));
+            return ResponseEntity.ok(pollService.savePoll(poll));
         }
     }
 
@@ -213,20 +212,56 @@ public class UserService {
             }
         }
 
-        Poll poll = pollRepo.findByid(applicant.getAppliedPollId());
+        Poll poll = pollService.findPoll(applicant.getAppliedPollId());
         poll.getApplicantsOfVoter().remove(obIdOfApplicant);
         Map<String, List<ObjectId>> mp = poll.getVoters();
 
         String post = applicant.getPost_applied_for();
         if(mp.containsKey(post)){
             mp.get(post).add(obIdOfApplicant);
-            return ResponseEntity.ok(pollRepo.save(poll));
+            return ResponseEntity.ok(pollService.savePoll(poll));
         }
         else{
             mp.put(post, new ArrayList<>(Arrays.asList(obIdOfApplicant)));
-            return ResponseEntity.ok(pollRepo.save(poll));
+            return ResponseEntity.ok(pollService.savePoll(poll));
         }
 
+    }
+
+    public Result computeResult(String pollId){
+        Authentication authentication = SecurityContextHolder.createEmptyContext().getAuthentication();
+        String username = authentication.getName();
+        User user = userRepo.findByemail(username);
+
+        if(!user.getElections().contains(new ObjectId(pollId))){
+            return null;
+        }
+
+        Poll poll = pollService.findPoll(pollId);
+        if(poll.getEndDateTime().isAfter(LocalDateTime.now())){
+            return null;
+        }
+        if(poll.getResultAnnounced()){
+            return  resultService.findResult(pollId);
+        }
+
+        List<PollCandidate> list = new ArrayList<>();
+        list = pollCandidateService.getPollCandidatesForResult(pollId);
+        Map<String, Map<String,Integer>> result = new HashMap<>();
+
+        for(String post: poll.getPosts()){
+            result.put(post,new HashMap<String, Integer>());
+        }
+        for(PollCandidate pc: list){
+            result.get(pc.getPost()).put(pc.getCandidateId().toHexString(), pc.getVotes());
+        }
+
+        Result r = new Result();
+        r.setResult(result);
+        r.setPollId(new ObjectId(pollId));
+        poll.setResultAnnounced(true);
+        pollService.savePoll(poll);
+        return resultService.save(r);
     }
 
 }

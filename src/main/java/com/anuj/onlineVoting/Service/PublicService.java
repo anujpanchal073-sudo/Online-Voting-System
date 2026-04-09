@@ -1,6 +1,8 @@
 package com.anuj.onlineVoting.Service;
 
+import com.anuj.onlineVoting.Entities.Candidate;
 import com.anuj.onlineVoting.Entities.User;
+import com.anuj.onlineVoting.Entities.Voter;
 import com.anuj.onlineVoting.Repository.UserRepository;
 import com.anuj.onlineVoting.Utils.JwtUtil;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -40,14 +42,38 @@ public class PublicService {
         }
     }
 
-    public String login(User user){
+    public String loginUser(User user){
         try{
             authenticationManager.authenticate(new
                     UsernamePasswordAuthenticationToken(user.getEmail(), user.getPassword()));
             UserDetails userDetails = userDetailsImpl.loadUserByUsername(user.getEmail());
-            return jwtUtil.generateToken(userDetails.getUsername());
+            return jwtUtil.generateToken(userDetails.getUsername(), "USER");
         } catch (Exception e) {
             return "No such user found";
+        }
+    }
+
+    public String loginCandidate(Candidate candidate){
+        try{
+            authenticationManager.authenticate(
+                    new UsernamePasswordAuthenticationToken(candidate.getEmail(), candidate.getPassword())
+            );
+            UserDetails userDetails = userDetailsImpl.loadUserByUsername(candidate.getEmail());
+            return jwtUtil.generateToken(userDetails.getUsername(), "CANDIDATE");
+        } catch (Exception e) {
+            return "No such candidate found";
+        }
+    }
+
+    public String loginVoter(Voter voter){
+        try {
+            authenticationManager.authenticate(
+                    new UsernamePasswordAuthenticationToken(voter.getEmail(), voter.getPassword())
+            );
+            UserDetails userDetails = userDetailsImpl.loadUserByUsername(voter.getEmail());
+            return jwtUtil.generateToken(userDetails.getUsername(), "VOTER");
+        } catch (Exception e) {
+            return "No such voter found";
         }
     }
 

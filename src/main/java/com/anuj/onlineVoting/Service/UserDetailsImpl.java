@@ -29,46 +29,32 @@ public class UserDetailsImpl implements UserDetailsService {
 
         User user = userRepo.findByemail(email);
         if(user != null){
-            try{
-                UserDetails userDetails = org.springframework.security.core.userdetails.User.builder()
-                        .username(user.getEmail())
-                        .roles(user.getRoles().toArray(new String[0]))
-                        .password(user.getPassword())
-                        .build();
-                return userDetails;
-            } catch (Exception e) {
-                System.out.println(e);
-            }
+            UserDetails userDetails = org.springframework.security.core.userdetails.User.builder()
+                    .username(user.getEmail())
+                    .roles(user.getRoles().toArray(new String[0]))
+                    .password(user.getPassword())
+                    .build();
+            return userDetails;
         }
 
         Candidate candidate = candidateRepo.findByemail(email);
         if(candidate != null){
-            try{
-                UserDetails userDetails = org.springframework.security.core.userdetails.User.builder()
-                        .username(candidate.getEmail())
-                        .roles(candidate.getRole())
-                        .password(candidate.getPassword())
-                        .build();
-                System.out.println("user built");
-                return userDetails;
-            } catch (Exception e) {
-                System.out.println(e);
-            }
+            UserDetails userDetails = org.springframework.security.core.userdetails.User.builder()
+                    .username(candidate.getEmail())
+                    .roles(candidate.getRole())
+                    .password(candidate.getPassword())
+                    .build();
+            return userDetails;
         }
 
         Voter voter = voterRepo.findByemail(email);
         if(voter != null){
-            try{
-                UserDetails userDetails = org.springframework.security.core.userdetails.User.builder()
-                        .username(voter.getEmail())
-                        .roles(voter.getRole())
-                        .password(voter.getPassword())
-                        .build();
-                System.out.println("user built");
-                return userDetails;
-            } catch (Exception e) {
-                System.out.println(e);
-            }
+            UserDetails userDetails = org.springframework.security.core.userdetails.User.builder()
+                    .username(voter.getEmail())
+                    .roles(voter.getRole())
+                    .password(voter.getPassword())
+                    .build();
+            return userDetails;
         }
 
         throw new UsernameNotFoundException("no user found with username " + email);
