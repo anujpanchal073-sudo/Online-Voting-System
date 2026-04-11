@@ -121,7 +121,7 @@ public class UserService {
         Candidate candidate = candidateService.findByemail(applicant.getEmail());
         Poll poll = pollService.findPoll(applicant.getAppliedPollId().toHexString());
         if(candidate != null){
-            PollCandidate pollCandidate = criteriaRepo.findPollCandidateByEmailAndPollId(applicant.getAppliedPollId(),candidate.getId());
+            PollCandidate pollCandidate = criteriaRepo.findPollCandidateByCandidateIdAndPollId(applicant.getAppliedPollId(),candidate.getId());
             if(pollCandidate != null){
                 return ResponseEntity.ok(" The applicant already exits as candidate for selected poll " + pollCandidate);
             }

@@ -6,10 +6,13 @@ import com.anuj.onlineVoting.Entities.User;
 import com.anuj.onlineVoting.Entities.Voter;
 import com.anuj.onlineVoting.Service.ApplicantService;
 import com.anuj.onlineVoting.Service.PublicService;
+import com.anuj.onlineVoting.Service.ResultService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.Objects;
 
 @Slf4j
 @RestController
@@ -55,6 +58,11 @@ public class PublicController {
     @PostMapping("login/voter")
     public String login(@RequestBody Voter voter){
         return publicService.loginVoter(voter);
+    }
+
+    public ResponseEntity<?> seeResult(@PathVariable String pollId){
+        return ResponseEntity
+                .ok(Objects.requireNonNullElse(publicService.findResult(pollId), "No such poll found or Result has not declared yet."));
     }
 
 }

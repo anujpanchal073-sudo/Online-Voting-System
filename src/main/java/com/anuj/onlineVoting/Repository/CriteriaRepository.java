@@ -27,9 +27,9 @@ public class CriteriaRepository {
         return  pollVoters.get(0);
     }
 
-    public PollCandidate findPollCandidateByEmailAndPollId(ObjectId pollId, ObjectId candidateId){
+    public PollCandidate findPollCandidateByCandidateIdAndPollId(ObjectId pollId, ObjectId candidateId){
         Query query = new Query();
-        query.addCriteria(Criteria.where("pollId").is(pollId).and("voterId").is(candidateId));
+        query.addCriteria(Criteria.where("pollId").is(pollId).and("candidateId").is(candidateId));
         List<PollCandidate> pollCandidates = mongoTemplate.find(query, PollCandidate.class);
         return  pollCandidates.get(0);
     }

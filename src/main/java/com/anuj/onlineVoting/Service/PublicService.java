@@ -1,6 +1,7 @@
 package com.anuj.onlineVoting.Service;
 
 import com.anuj.onlineVoting.Entities.Candidate;
+import com.anuj.onlineVoting.Entities.Result;
 import com.anuj.onlineVoting.Entities.User;
 import com.anuj.onlineVoting.Entities.Voter;
 import com.anuj.onlineVoting.Repository.UserRepository;
@@ -29,6 +30,9 @@ public class PublicService {
 
     @Autowired
     JwtUtil jwtUtil;
+
+    @Autowired
+    ResultService resultService;
 
     public boolean saveUser(User user){
         try{
@@ -75,6 +79,10 @@ public class PublicService {
         } catch (Exception e) {
             return "No such voter found";
         }
+    }
+
+    public Result findResult(String pollId){
+        return resultService.findResult(pollId);
     }
 
 }
