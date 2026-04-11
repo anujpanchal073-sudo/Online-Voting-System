@@ -32,7 +32,15 @@ public class VoterService {
     @Autowired
     JwtUtil jwtUtil;
 
-    public ResponseEntity<?> saveVoter(Applicant applicant){
+    public Voter findByemail(String email){
+        return voterRepo.findByemail(email);
+    }
+
+    public Voter saveUpdate(Voter voter){
+        return voterRepo.save(voter);
+    }
+
+    public ResponseEntity<?> saveNew(Applicant applicant){
         try{
             Voter voter = new Voter();
             BeanUtils.copyProperties(applicant,voter);
@@ -48,7 +56,7 @@ public class VoterService {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         String username = authentication.getName();
         ObjectId obPollId = new ObjectId(pollId);
-        Voter voter = voterRepo.findByemail(username);
+        Voter voter = findByemail(username);
         Poll poll = pollService.findPoll(pollId);
         if(voter.getAppliedPollId().contains(obPollId)){
             if(poll.getStartDateTime().isAfter(LocalDateTime.now())){
@@ -103,7 +111,7 @@ public class VoterService {
         ObjectId pollId = jwtUtil.getPollId(vote.getVoteId());
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         String email = authentication.getName();
-        Voter voter = voterRepo.findByemail(email);
+        Voter voter = findByemail(email);
         PollVoter pollVoter =  (PollVoter) pollCandidateService.castVote(pollId, voter.getId(), vote.getVotes()).getBody();
         pollVoterService.save(pollVoter);
         return ResponseEntity.ok(true);

@@ -2,16 +2,12 @@ package com.anuj.onlineVoting.Service;
 
 import com.anuj.onlineVoting.Entities.Applicant;
 import com.anuj.onlineVoting.Entities.Candidate;
-import com.anuj.onlineVoting.Entities.Poll;
 import com.anuj.onlineVoting.Repository.CandidateRepository;
 import com.anuj.onlineVoting.Repository.PollRepository;
-import org.bson.types.ObjectId;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
-
-import java.time.LocalDateTime;
 
 @Service
 public class CandidateService {
@@ -22,7 +18,15 @@ public class CandidateService {
     @Autowired
     PollRepository pollRepo;
 
-    public ResponseEntity<?> saveCandidate(Applicant applicant){
+    public Candidate findByemail(String email){
+        return candidateRepo.findByemail(email);
+    }
+
+    public Candidate saveUpdate(Candidate candidate){
+        return candidateRepo.save(candidate);
+    }
+
+    public ResponseEntity<?> saveNew(Applicant applicant){
         try{
             Candidate candidate = new Candidate();
             BeanUtils.copyProperties(applicant,candidate);

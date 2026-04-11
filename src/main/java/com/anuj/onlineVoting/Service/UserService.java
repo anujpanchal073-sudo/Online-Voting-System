@@ -24,19 +24,13 @@ public class UserService {
     PollService pollService;
 
     @Autowired
-    ApplicantRepository applicantRepo;
-
-    @Autowired
-    VoterRepository voterRepo;
-
-    @Autowired
-    CandidateRepository candidateRepo;
-
-    @Autowired
-    CandidateService candidateService;
+    ApplicantService applicantService;
 
     @Autowired
     VoterService voterService;
+
+    @Autowired
+    CandidateService candidateService;
 
     @Autowired
     PollCandidateService pollCandidateService;
@@ -45,7 +39,7 @@ public class UserService {
     CriteriaRepository criteriaRepo;
 
     @Autowired
-    PollVoterRepository pollVoterRepo;
+    PollVoterService pollVoterService;
 
     @Autowired
     ResultService resultService;
@@ -70,10 +64,10 @@ public class UserService {
     }
 
     //TO VIEW CANDIDATURE APPLICATIONS
-    public List<Applicant> viewCandidatureApplications(String id){
+    public List<Applicant> viewCandidatureApplications(String pollId){
         List<Applicant> applicants = new ArrayList<>();
-        for(ObjectId o: pollService.findPoll(id).getApplicantsOfCandidature()){
-            applicants.add(applicantRepo.findByid(o));
+        for(ObjectId o: pollService.findPoll(pollId).getApplicantsOfCandidature()){
+            applicants.add(applicantService.findById(o));
         }
         return applicants;
     }
@@ -82,7 +76,7 @@ public class UserService {
     public List<Applicant> viewVoterApplications(String id){
         List<Applicant> applicants = new ArrayList<>();
         for(ObjectId o: pollService.findPoll(id).getApplicantsOfVoter()){
-            applicants.add(applicantRepo.findByid(o));
+            applicants.add(applicantService.findById(o));
         }
         return applicants;
     }
@@ -91,11 +85,11 @@ public class UserService {
     public Boolean rejectCandidatureApplication(String idOfApplicant){
         try{
             ObjectId obIdOfApplicant = new ObjectId(idOfApplicant);
-            Applicant applicant = applicantRepo.findByid(obIdOfApplicant);
+            Applicant applicant = applicantService.findById(obIdOfApplicant);
             Poll poll = pollService.findPoll(applicant.getAppliedPollId().toHexString());
             poll.getApplicantsOfCandidature().remove(obIdOfApplicant);
             pollService.savePoll(poll);
-            applicantRepo.deleteById(obIdOfApplicant);
+            applicantService.deleteById(obIdOfApplicant);
             return true;
         } catch (Exception e) {
             System.out.println(e);
@@ -107,11 +101,11 @@ public class UserService {
     public Boolean rejectVoterApplication(String idOfApplicant){
         try{
             ObjectId obIdOfApplicant = new ObjectId(idOfApplicant);
-            Applicant applicant = applicantRepo.findByid(obIdOfApplicant);
+            Applicant applicant = applicantService.findById(obIdOfApplicant);
             Poll poll = pollService.findPoll(applicant.getAppliedPollId().toHexString());
             poll.getApplicantsOfVoter().remove(obIdOfApplicant);
             pollService.savePoll(poll);
-            applicantRepo.deleteById(obIdOfApplicant);
+            applicantService.deleteById(obIdOfApplicant);
             return true;
         } catch (Exception e) {
             System.out.println(e);
@@ -123,8 +117,8 @@ public class UserService {
     public ResponseEntity<?> acceptCandidatureApplication(String idOfApplicant){
 
         ObjectId obIdOfApplicant = new ObjectId(idOfApplicant);
-        Applicant applicant = applicantRepo.findByid(obIdOfApplicant);
-        Candidate candidate = candidateRepo.findByemail(applicant.getEmail());
+        Applicant applicant = applicantService.findById(obIdOfApplicant);
+        Candidate candidate = candidateService.findByemail(applicant.getEmail());
         Poll poll = pollService.findPoll(applicant.getAppliedPollId().toHexString());
         if(candidate != null){
             PollCandidate pollCandidate = criteriaRepo.findPollCandidateByEmailAndPollId(applicant.getAppliedPollId(),candidate.getId());
@@ -140,11 +134,11 @@ public class UserService {
                 pollCandidate1.setVotes(0);
                 pollCandidateService.save(pollCandidate1);
                 candidate.getAppliedPollId().add(applicant.getAppliedPollId());
-                candidateRepo.save(candidate);
+                candidateService.saveUpdate(candidate);
             }
         }
         else{
-            Candidate candidate1 = (Candidate) candidateService.saveCandidate(applicant).getBody();
+            Candidate candidate1 = (Candidate) candidateService.saveNew(applicant).getBody();
             PollCandidate pollCandidate = new PollCandidate();
             pollCandidate.setTitle_of_pole(poll.getTitle());
             pollCandidate.setCandidateId(candidate1.getId());
@@ -153,7 +147,7 @@ public class UserService {
             pollCandidate.setVotes(0);
             pollCandidateService.save(pollCandidate);
         }
-        applicantRepo.deleteById(obIdOfApplicant);
+        applicantService.deleteById(obIdOfApplicant);
         poll.getApplicantsOfCandidature().remove(obIdOfApplicant);
         Map<String, List<ObjectId>> mp = poll.getCandidates();
 
@@ -172,19 +166,19 @@ public class UserService {
     public ResponseEntity<?> acceptVoterApplication(String idOfApplicant){
 
         ObjectId obIdOfApplicant = new ObjectId(idOfApplicant);
-        Applicant applicant = applicantRepo.findByid(obIdOfApplicant);
+        Applicant applicant = applicantService.findById(obIdOfApplicant);
 
         if(applicant == null){
             return ResponseEntity.ok("No such record found");
         }
-        applicantRepo.deleteById(obIdOfApplicant);
-        Voter voter = voterRepo.findByemail(applicant.getEmail());
+        applicantService.deleteById(obIdOfApplicant);
+        Voter voter = voterService.findByemail(applicant.getEmail());
         if(voter != null){
             PollVoter pollVoter = criteriaRepo.findPollVoterByVoterIdAndPollId(applicant.getAppliedPollId(),voter.getId());
             if(pollVoter != null){
                 pollVoter.getPosts().add(applicant.getPost_applied_for());
                 pollVoter.getHas_voted().put(applicant.getPost_applied_for(), false);
-                pollVoterRepo.save(pollVoter);
+                pollVoterService.save(pollVoter);
             }
             else {
                 PollVoter pollVoter1 = new PollVoter();
@@ -192,20 +186,20 @@ public class UserService {
                 pollVoter1.setPollId(applicant.getAppliedPollId());
                 pollVoter1.getPosts().add(applicant.getPost_applied_for());
                 pollVoter1.getHas_voted().put(applicant.getPost_applied_for(),false);
-                pollVoterRepo.save(pollVoter1);
+                pollVoterService.save(pollVoter1);
             }
             voter.getAppliedPollId().add(applicant.getAppliedPollId());
-            voterRepo.save(voter);
+            voterService.saveUpdate(voter);
         }
         else{
-            Voter voter1 = (Voter) voterService.saveVoter(applicant).getBody();
+            Voter voter1 = (Voter) voterService.saveNew(applicant).getBody();
             if(voter1 != null){
                 PollVoter pollVoter1 = new PollVoter();
                 pollVoter1.setVoterId(voter1.getId());
                 pollVoter1.setPollId(applicant.getAppliedPollId());
                 pollVoter1.getPosts().add(applicant.getPost_applied_for());
                 pollVoter1.getHas_voted().put(applicant.getPost_applied_for(),false);
-                pollVoterRepo.save(pollVoter1);
+                pollVoterService.save(pollVoter1);
             }
             else{
                 return ResponseEntity.ok("Some error occured while making a voter corresponding to the application");

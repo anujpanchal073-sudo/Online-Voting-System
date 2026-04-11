@@ -24,6 +24,15 @@ public class ApplicantService {
 
     private static final PasswordEncoder encoder = new BCryptPasswordEncoder();
 
+    public Applicant findById(ObjectId applicantId){
+        return applicantRepo.findByid(applicantId);
+    }
+
+    public void deleteById(ObjectId applicantId){
+        applicantRepo.deleteById(applicantId);
+    }
+
+    public
     //FUNCTION TO SAVE APPLICATIONS
     //PUBLIC CONTROLLER - candidateApplication
     public ResponseEntity<?> submitCandidatureApplication(Applicant application, String p_id){
